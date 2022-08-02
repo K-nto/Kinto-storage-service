@@ -1,24 +1,33 @@
-console.log('Try npm run lint/fix!');
+import * as express from 'express';
+import * as http from 'http';
+import * as cors from 'cors';
+import * as debug from 'debug';
+import {CommonRoutesConfig} from './common/common.routes.config';
+import {UsersRoutes} from './users/users.routes.config';
+import {FilesRoutes} from './files/files.routes.config';
+import {NodesRoutes} from './nodes/nodes.routes.config';
 
-const longString =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut aliquet diam.';
+const app: express.Application = express();
+const server: http.Server = http.createServer(app);
+const port = process.env.PORT || 3000;
+const routes: Array<CommonRoutesConfig> = [];
+const debugLog: debug.IDebugger = debug('app');
 
-const trailing = 'Semicolon';
+app.use(express.json());
+app.use(cors());
 
-const why = 'am I tabbed?';
+routes.push(new UsersRoutes(app));
+routes.push(new FilesRoutes(app));
+routes.push(new NodesRoutes(app));
 
-export function doSomeStuff(
-  withThis: string,
-  andThat: string,
-  andThose: string[]
-) {
-  //function on one line
-  if (!andThose.length) {
-    return false;
-  }
-  console.log(withThis);
-  console.log(andThat);
-  console.dir(andThose);
-  return;
-}
-// TODO: more examples
+const runningMessage = `Server running at http://localhost:${port}`;
+app.get('/', (req: express.Request, res: express.Response) => {
+  res.status(200).send(runningMessage);
+});
+
+server.listen(port, () => {
+  routes.forEach((route: CommonRoutesConfig) => {
+    debugLog(`Routes configured for ${route.getName()}`);
+  });
+  console.log(runningMessage);
+});
