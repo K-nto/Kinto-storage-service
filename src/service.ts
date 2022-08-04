@@ -1,32 +1,33 @@
+import * as express from 'express';
+import * as http from 'http';
+import * as cors from 'cors';
+import * as debug from 'debug';
+import {CommonRoutesConfig} from './common/common.routes.config';
+import {UsersRoutes} from './users/users.routes.config';
+import {FilesRoutes} from './files/files.routes.config';
+import {NodesRoutes} from './nodes/nodes.routes.config';
 
-import { create } from 'ipfs-http-client'
+const app: express.Application = express();
+const server: http.Server = http.createServer(app);
+const port = process.env.PORT || 3000;
+const routes: Array<CommonRoutesConfig> = [];
+const debugLog: debug.IDebugger = debug('app');
 
-// connect to the default API address http://localhost:5001
-const client = create()
+app.use(express.json());
+app.use(cors());
 
-// connect to a different API
-const client = create({ url: "http://127.0.0.1:5002/api/v0" });
+routes.push(new UsersRoutes(app));
+routes.push(new FilesRoutes(app));
+routes.push(new NodesRoutes(app));
 
-// connect using a URL
-const client = create(new URL('http://127.0.0.1:5002'))
+const runningMessage = `Server running at http://localhost:${port}`;
+app.get('/', (req: express.Request, res: express.Response) => {
+  res.status(200).send(runningMessage);
+});
 
-// call Core API methods
-const { cid } = await client.add('Hello world!')
-
-export function doSomeStuff(
-  withThis: string,
-  andThat: string,
-  andThose: string[]
-) {
-  //function on one line
-  if (!andThose.length) {
-    return false;
-  }
-  console.log(withThis);
-  console.log(andThat);
-  console.dir(andThose);
-  return;
-}
-// TODO: more examples
-
-console.log('ZWtraSB2ZXJhIGhyw6ZnYW1tYQ== :D');
+server.listen(port, () => {
+  routes.forEach((route: CommonRoutesConfig) => {
+    debugLog(`Routes configured for ${route.getName()}`);
+  });
+  console.log(runningMessage);
+});

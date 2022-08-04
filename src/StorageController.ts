@@ -10,8 +10,8 @@ export class StorageController {
     /**
      * SaveFile
      */
-    public saveFile(walletAddress: string, file: any) {
-        if (!this.hyperledgerController.checkUserExists(walletAddress)) return false; //TODO Return some error or sth
+    public saveFile(walletAddress: string, file: any): void {
+        if (!this.hyperledgerController.checkUserExists(walletAddress)) return ; //TODO Return some error or sth
         
         //TODO define contract name
         //TODO define channel name
@@ -35,7 +35,7 @@ export class StorageController {
 
     //TODO define file location
     public getFile(walletAddress: string, fileLocation: any) {
-        if (!this.hyperledgerController.checkUserExists(walletAddress)) return false; //TODO Return some error or sth
+        if (!this.hyperledgerController.checkUserExists(walletAddress)) return ; //TODO Return some error or sth
         
         //TODO define contract name
         //TODO define channel name
