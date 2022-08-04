@@ -2,8 +2,8 @@
   "name": "Kinto-storage-service",
   "version": "0.1.0",
   "description": "",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/src/service.js",
+  "types": "build/src/service.d.ts",
   "files": [
     "build/src"
   ],
@@ -33,6 +33,10 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "fabric-network": "^2.2.14",
+    "ipfs-core-types": "^0.11.1",
+    "ipfs-http-client": "^57.0.3",
+    "tsc": "^2.0.4",
     "cors": "^2.8.5",
     "debug": "^4.3.4",
     "express": "^4.18.1"
