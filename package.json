@@ -17,17 +17,32 @@
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "start": "tsc && node --unhandled-rejections=strict ./build/src/index.js"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/debug": "^4.1.7",
+    "@types/express": "^4.17.13",
     "@types/jest": "^28.1.6",
     "@types/node": "^14.11.2",
     "gts": "^3.1.0",
     "jest": "^28.1.3",
     "ts-jest": "^28.0.7",
+    "tslint": "^6.1.3",
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "tsc": "^2.0.4"
+    "cors": "^2.8.5",
+    "debug": "^4.3.4",
+    "express": "^4.18.1"
+  },
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "./build",
+    "strict": true,
+    "esModuleInterop": true,
+    "inlineSourceMap": true
   }
 }
