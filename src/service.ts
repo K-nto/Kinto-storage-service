@@ -1,11 +1,11 @@
-import * as express from 'express';
-import * as http from 'http';
-import * as cors from 'cors';
-import * as debug from 'debug';
+import debug from 'debug';
 import {CommonRoutesConfig} from './common/common.routes.config';
 import {UsersRoutes} from './users/users.routes.config';
 import {FilesRoutes} from './files/files.routes.config';
 import {NodesRoutes} from './nodes/nodes.routes.config';
+import express from 'express';
+import * as http from 'http';
+import cors = require('cors');
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
