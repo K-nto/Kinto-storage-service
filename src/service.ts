@@ -6,7 +6,7 @@ import {NodesRoutes} from './nodes/nodes.routes.config';
 import express from 'express';
 import * as http from 'http';
 import cors = require('cors');
-import { HyperledgerControler } from './hyperledger/HyperledgerController';
+import { HyperledgerController } from './hyperledger/HyperledgerController';
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
@@ -14,6 +14,7 @@ const port = process.env.PORT || 3000;
 const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
 
+require('dotenv').config();
 /*
 
 app.use(express.json());
@@ -38,9 +39,22 @@ server.listen(port, () => {
 
 console.log('ALO');
 const abc = async () => {
-  const hyperledgerController = new HyperledgerControler();
+  try {
+    const hyperledgerController = await HyperledgerController.create();
+    const mspid = "Org1MSP";
 
-  await hyperledgerController.getAuthenticator().registerAdmin();
-  hyperledgerController
+    console.log("Registering admin")
+    //await hyperledgerController.getAuthenticator().registerAdmin(mspid);
+    console.log("OK")
+
+    console.log("Registering user")
+    await hyperledgerController.getAuthenticator().registerUser("appUser", "org1.department1", mspid);
+    console.log("OK")
+
+    console.log("Executing transaction")
+    await hyperledgerController.executeTransaction("appUser", "mychannel", "fabcar", "queryAllCars");
+  } catch (error) {
+    console.log(error);
+  }
 }
 abc().then((response) => console.log("FINISHED"));

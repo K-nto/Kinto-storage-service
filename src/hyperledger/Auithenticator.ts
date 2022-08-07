@@ -1,19 +1,19 @@
-import {Gateway, Wallets, X509Identity} from 'fabric-network';
+import {Gateway, Wallet, Wallets, X509Identity} from 'fabric-network';
 import FabricCAServices from 'fabric-ca-client';
+import { Console } from 'console';
 
 export class Authenticator {
-  private networkConfiguration: any;
-  private wallet: any;
-  private certificateAuthorityClient: any;
+  private networkConfiguration: any; 
+  private wallet: Wallet;
   private certificateAuthorityInfo: any;
 
-  constructor(networkConfiguration: any, organizationId: string) {
+  constructor(walletInstance: Wallet, networkConfiguration: any, organizationId: string) {
+    this.wallet = walletInstance;
     this.networkConfiguration = networkConfiguration;
-    this.wallet = Wallets.newFileSystemWallet(`${process.env.WALLET_PATH}`); // Create a new file system based wallet for managing identities.
-
     this.certificateAuthorityInfo =
       this.networkConfiguration.certificateAuthorities[organizationId];
   }
+
 
   /**
    *  @method checkUserExists
@@ -55,15 +55,14 @@ export class Authenticator {
         this.certificateAuthorityInfo.url
       );
 
-      if (await this.checkUserExists(userWalletAddress))
+      /*if (await this.checkUserExists(userWalletAddress))
         throw new Error(
           'A user is already registered with the following wallet address: ' +
             userWalletAddress
-        );
+        );*/
 
       const adminUser = await this.getAdminContext();
-
-      const secret = await this.certificateAuthorityClient.register(
+      const secret = await certificateAuthority.register(
         {
           affiliation: organization,
           enrollmentID: userWalletAddress,
@@ -94,13 +93,14 @@ export class Authenticator {
     try {
       // organization = ca.org1.example.com
       const TLSCertificate = this.certificateAuthorityInfo.tlsCACerts.pem;
-      const certificateAuthority = new FabricCAServices(
+      const certificateAuthority: FabricCAServices = new FabricCAServices(
         this.certificateAuthorityInfo.url,
         {trustedRoots: TLSCertificate, verify: false},
         this.certificateAuthorityInfo.caName
       );
 
-      await this.getAdminIdentity(); //Check identity exists
+
+      //await this.getAdminIdentity(); //Check identity exists
 
       // Enroll the admin user, and import the new identity into the wallet.
       return await this.enrollIdentity(
@@ -132,6 +132,7 @@ export class Authenticator {
     mspId: string
   ): Promise<boolean> {
     try {
+        //TODO issue with admin wallet address and secret
       const enrollment = await client.enroll({
         enrollmentID: walletAddress,
         enrollmentSecret: secret,

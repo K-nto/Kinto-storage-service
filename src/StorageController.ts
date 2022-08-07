@@ -1,10 +1,10 @@
-import {HyperledgerControler} from './hyperledger/HyperledgerController';
+import {HyperledgerController} from './hyperledger/HyperledgerController';
 
 //TODO improve error messages
 export class StorageController {
-  private hyperledgerController: HyperledgerControler;
+  private hyperledgerController: HyperledgerController;
 
-  constructor(hyperledgerControllerInstance: HyperledgerControler) {
+  constructor(hyperledgerControllerInstance: HyperledgerController) {
     this.hyperledgerController = hyperledgerControllerInstance;
   }
 
@@ -21,18 +21,10 @@ export class StorageController {
 
     //TODO define contract name
     //TODO define channel name
-    const constract = this.hyperledgerController.getContract(
-      walletAddress,
-      'write',
-      'some_channel'
-    )
+    //const constract = this.hyperledgerController.getContract()
 
     //TODO execute some transaction
-    const response = this.hyperledgerController.executeTransaction(
-      constract,
-      '{}'
-    );
-    console.log('SAVED FILE', response);
+    //const response = this.hyperledgerController.executeTransaction();
 
     /*
         //TODO Implement IPFS
@@ -57,18 +49,10 @@ export class StorageController {
 
     //TODO define contract name
     //TODO define channel name
-    const constract = this.hyperledgerController.getContract(
-      walletAddress,
-      'read',
-      'some_channel'
-    )
-    //TODO execute some transaction
-    const response = this.hyperledgerController.executeTransaction(
-      constract,
-      '{}'
-    );
-    console.log('SAVED FILE', response);
+    //const constract = this.hyperledgerController.getContract()
 
+    //TODO execute some transaction
+    //const response = this.hyperledgerController.executeTransaction();
     /*
         //TODO Implement IPFS
         */

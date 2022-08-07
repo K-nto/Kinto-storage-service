@@ -1,9 +1,9 @@
-import {HyperledgerControler} from './../hyperledger/HyperledgerController';
+import {HyperledgerController} from './../hyperledger/HyperledgerController';
 
 //TODO improve error messages
 export class UsersController {
-  private hyperledgerController: HyperledgerControler;
-  constructor(hyperledgerControllerInstance: HyperledgerControler) {
+  private hyperledgerController: HyperledgerController;
+  constructor(hyperledgerControllerInstance: HyperledgerController) {
     this.hyperledgerController = hyperledgerControllerInstance;
   }
 
