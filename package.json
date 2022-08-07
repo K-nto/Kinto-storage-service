@@ -18,7 +18,7 @@
     "prepare": "tsc",
     "pretest": "npm run compile",
     "posttest": "npm run lint",
-    "start": "tsc && node --unhandled-rejections=strict ./build/src/index.js"
+    "start": "tsc && node --unhandled-rejections=strict ./build/src/service.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
