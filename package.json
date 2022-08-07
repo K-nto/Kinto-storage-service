@@ -18,7 +18,7 @@
     "prepare": "tsc",
     "pretest": "npm run compile",
     "posttest": "npm run lint",
-    "start": "tsc && node --unhandled-rejections=strict ./build/src/index.js"
+    "start": "tsc && node --unhandled-rejections=strict ./build/src/service.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
@@ -37,6 +37,7 @@
     "cors": "^2.8.5",
     "debug": "^4.3.4",
     "express": "^4.18.1",
+    "fabric-ca-client": "^2.2.14",
     "fabric-network": "^2.2.14",
     "ipfs-core-types": "^0.11.1",
     "ipfs-http-client": "^57.0.3"

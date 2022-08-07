@@ -1,33 +1,21 @@
 import {Gateway, Wallets} from 'fabric-network';
 import * as fs from 'fs';
+import {Authenticator} from './Auithenticator';
 
 export class HyperledgerControler {
   private networkConfiguration: any;
   private wallet: any;
+  private authenticator: Authenticator;
 
   constructor() {
     this.networkConfiguration = JSON.parse(
       fs.readFileSync(`${process.env.CCP_PATH}`, 'utf8')
     ); // load the network configuration
     this.wallet = Wallets.newFileSystemWallet(`${process.env.WALLET_PATH}`); // Create a new file system based wallet for managing identities.
-  }
-
-  /**
-   *  @method checkUserExists
-   *  @description Checks if wallet address is registered on hyperledger network
-   *  @param walletAddress
-   */
-  public async checkUserExists(walletAddress: string): Promise<boolean> {
-    const identity = await this.wallet.get(walletAddress);
-    if (identity) {
-      return true;
-    }
-    console.log(
-      'There is no identity for "' +
-        walletAddress +
-        '" does not exist in the network'
+    this.authenticator = new Authenticator(
+      this.networkConfiguration,
+      String(process.env.ORG_ID)
     );
-    return false;
   }
 
   /**
@@ -49,7 +37,10 @@ export class HyperledgerControler {
 
     const network = await gateway.getNetwork(channel); // Channel network.
 
-    return network.getContract(contractName);
+    const contract = network.getContract(contractName);
+
+    await gateway.disconnect();
+    return contract;
   }
 
   public async executeTransaction(
@@ -64,5 +55,9 @@ export class HyperledgerControler {
       `Transaction has been evaluated, result is: ${result.toString()}`
     );
     return result.toString();
+  }
+
+  public getAuthenticator(): Authenticator {
+    return this.authenticator;
   }
 }

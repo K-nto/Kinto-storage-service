@@ -6,12 +6,15 @@ import {NodesRoutes} from './nodes/nodes.routes.config';
 import express from 'express';
 import * as http from 'http';
 import cors = require('cors');
+import { HyperledgerControler } from './hyperledger/HyperledgerController';
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const port = process.env.PORT || 3000;
 const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
+
+/*
 
 app.use(express.json());
 app.use(cors());
@@ -31,3 +34,13 @@ server.listen(port, () => {
   });
   console.log(runningMessage);
 });
+*/
+
+console.log('ALO');
+const abc = async () => {
+  const hyperledgerController = new HyperledgerControler();
+
+  await hyperledgerController.getAuthenticator().registerAdmin();
+  hyperledgerController
+}
+abc().then((response) => console.log("FINISHED"));
