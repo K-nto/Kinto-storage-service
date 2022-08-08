@@ -5,13 +5,15 @@ import {FilesRoutes} from './files/files.routes.config';
 import {NodesRoutes} from './nodes/nodes.routes.config';
 import express from 'express';
 import * as http from 'http';
-import cors = require('cors');
+import {IPFSController} from './ipfs/ipfs.controller';
+import cors from 'cors';
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const port = process.env.PORT || 3000;
 const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
+const ipfs = new IPFSController();
 
 app.use(express.json());
 app.use(cors());
@@ -22,7 +24,7 @@ routes.push(new NodesRoutes(app));
 
 const runningMessage = `Server running at http://localhost:${port}`;
 app.get('/', (req: express.Request, res: express.Response) => {
-  res.status(200).send(runningMessage);
+  res.status(200).send(ipfs.readFile('hola'));
 });
 
 server.listen(port, () => {
