@@ -42,17 +42,20 @@ const abc = async () => {
   try {
     const hyperledgerController = await HyperledgerController.create();
     const mspid = "Org1MSP";
+    const user = "appUser";
 
     console.log("Registering admin")
     //await hyperledgerController.getAuthenticator().registerAdmin(mspid);
     console.log("OK")
 
     console.log("Registering user")
-    await hyperledgerController.getAuthenticator().registerUser("appUser", "org1.department1", mspid);
+    //await hyperledgerController.getAuthenticator().registerUser(user, "org1.department1", mspid);
     console.log("OK")
 
     console.log("Executing transaction")
-    await hyperledgerController.executeTransaction("appUser", "mychannel", "fabcar", "queryAllCars");
+    const transactionResult = await hyperledgerController.executeTransaction(user, "mychannel", "fabcar", "queryCar", "CAR4");
+    
+    console.log("Transaction Result: ", transactionResult)
   } catch (error) {
     console.log(error);
   }

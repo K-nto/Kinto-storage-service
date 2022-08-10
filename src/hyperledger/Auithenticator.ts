@@ -55,6 +55,7 @@ export class Authenticator {
         this.certificateAuthorityInfo.url
       );
 
+      //TODO check this logic
       /*if (await this.checkUserExists(userWalletAddress))
         throw new Error(
           'A user is already registered with the following wallet address: ' +
