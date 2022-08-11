@@ -1,6 +1,7 @@
 import {Application, Request, Response, NextFunction} from 'express';
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {FILES, USERS} from '../common/common.routes.consts';
+import filesController from './files.controller';
 
 export class FilesRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
@@ -18,11 +19,7 @@ export class FilesRoutes extends CommonRoutesConfig {
           .status(200)
           .send(`TODO: GET list of files for ${req.params.userId}`);
       })
-      .post((req: Request, res: Response) => {
-        res
-          .status(200)
-          .send(`TODO: Post new file to userId ${req.params.userId}`);
-      });
+      .post(filesController.createFile);
 
     this.app
       .route(`/${USERS}/:userId/${FILES}/:fileId`)

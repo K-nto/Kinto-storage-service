@@ -1,11 +1,11 @@
+import {UploadedFile} from 'express-fileupload';
 import {MFSEntry} from 'ipfs-core-types/src/files';
 import {CID, create, IPFSHTTPClient} from 'ipfs-http-client';
 import all from 'it-all';
-
-/** Probably a service instead of a controller
+/**
  * @TODO: Better error handling
  */
-export class IPFSController {
+class IPFSService {
   private static ipfsHttpClient: IPFSHTTPClient;
   /**
    * Immutable vs mutable FS debate needs to happen
@@ -14,8 +14,10 @@ export class IPFSController {
 
   constructor() {
     // @TBD: Network url
-    if (!IPFSController.ipfsHttpClient)
-      IPFSController.ipfsHttpClient = create();
+    if (!IPFSService.ipfsHttpClient)
+      IPFSService.ipfsHttpClient = create({
+        url: 'http://127.0.0.1:5002/api/v0',
+      });
   }
 
   /**
@@ -26,21 +28,17 @@ export class IPFSController {
    * @param filesArray
    * @returns Array<MFSEntry> w/ the results from the node
    * @TODO: test if JS File native type is cool with IPFS
+   * @TODO: add userId to file?? <- In theory, ipfs stores annonymous, encrypted chunks of the files.
    */
-  public async createFiles(filesArray: Array<File>) {
-    const filePaths: Array<string> = [];
-    const result: Array<MFSEntry> = [];
-    await filesArray.forEach(file => {
-      // adds to the root dir
-      filePaths.push('/' + file.name);
-      IPFSController.ipfsHttpClient.files.write('/' + file.name, file, {
-        create: true,
-      });
+  public async createFile(
+    userId: string,
+    file: UploadedFile
+  ): Promise<MFSEntry[]> {
+    const filePath = `/${file.name}`;
+    await IPFSService.ipfsHttpClient.files.write(filePath, file.data, {
+      create: true,
     });
-    await filePaths.forEach(async path =>
-      result.push(...(await all(IPFSController.ipfsHttpClient.files.ls(path))))
-    );
-    return result;
+    return await all(IPFSService.ipfsHttpClient.files.ls(filePath));
   }
 
   /**
@@ -53,7 +51,7 @@ export class IPFSController {
    */
   public async readFile(cid: CID) {
     const fileChunks = [];
-    for await (const chunk of IPFSController.ipfsHttpClient.cat(cid)) {
+    for await (const chunk of IPFSService.ipfsHttpClient.cat(cid)) {
       fileChunks.push(chunk);
     }
     return Buffer.concat(fileChunks);
@@ -70,10 +68,8 @@ export class IPFSController {
    */
   public async updateFile(file: File) {
     const result: Array<MFSEntry> = [];
-    IPFSController.ipfsHttpClient.files.write('/' + file.name, file);
-    result.push(
-      ...(await all(IPFSController.ipfsHttpClient.files.ls(file.name)))
-    );
+    // IPFSService.ipfsHttpClient.files.write('/' + file.name, file);
+    // result.push(...(await all(IPFSService.ipfsHttpClient.files.ls(file.name))));
     return result;
   }
 
@@ -84,7 +80,7 @@ export class IPFSController {
    * @returns string on success, otherwise throws error
    */
   public async deleteFile(path: string) {
-    return await IPFSController.ipfsHttpClient.files
+    return await IPFSService.ipfsHttpClient.files
       .rm(path)
       .then(() => `FILE ON PATH ${path} DELETED`)
       .catch(error => {
@@ -92,3 +88,5 @@ export class IPFSController {
       });
   }
 }
+
+export default new IPFSService();
