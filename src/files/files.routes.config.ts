@@ -14,12 +14,10 @@ export class FilesRoutes extends CommonRoutesConfig {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
         next();
       })
-      .get((req: Request, res: Response) => {
-        res
-          .status(200)
-          .send(`TODO: GET list of files for ${req.params.userId}`);
-      })
-      .post(filesController.createFile);
+      .get(filesController.listFiles)
+      .post(filesController.createFile)
+      // @TODO: this uses filename and it's not really usable in a multiple-node context.
+      .delete(filesController.deleteFile);
 
     this.app
       .route(`/${USERS}/:userId/${FILES}/:fileId`)
@@ -27,14 +25,10 @@ export class FilesRoutes extends CommonRoutesConfig {
         // Middleware executed on every route. @TODO: Validation @TODO: User authentication @TODO: Register on Hyperledger
         next();
       })
-      .get((req: Request, res: Response) => {
-        res.status(200).send(`TODO: GET file for ${req.params.fileId}`);
-      })
+      .get(filesController.getFile)
       .patch((req: Request, res: Response) => {
+        // @TODO: Define if possible
         res.status(200).send(`TODO: PATCH file for id ${req.params.fileId}`);
-      })
-      .delete((req: Request, res: Response) => {
-        res.status(200).send(`TODO: DELETE file for id ${req.params.fileId}`);
       });
 
     return this.app;

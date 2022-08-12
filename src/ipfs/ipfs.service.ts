@@ -38,7 +38,17 @@ class IPFSService {
     await IPFSService.ipfsHttpClient.files.write(filePath, file.data, {
       create: true,
     });
-    return await all(IPFSService.ipfsHttpClient.files.ls(filePath));
+    return await this.listFiles(filePath);
+  }
+
+  /**
+   * lists all the files in a directory
+   * @param dir defaults to '/' (node root)
+   * @returns Array<MFSEntry> w/ the results from the node
+   * @TODO: will have to change once userId is implemented
+   */
+  public async listFiles(dir = '/'): Promise<MFSEntry[]> {
+    return await all(IPFSService.ipfsHttpClient.files.ls(dir));
   }
 
   /**
@@ -49,7 +59,7 @@ class IPFSService {
    * @param cid file CID
    * @returns Buffer
    */
-  public async readFile(cid: CID) {
+  public async readFile(cid: string) {
     const fileChunks = [];
     for await (const chunk of IPFSService.ipfsHttpClient.cat(cid)) {
       fileChunks.push(chunk);
