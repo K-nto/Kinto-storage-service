@@ -1,7 +1,5 @@
 import {Response, Request} from 'express';
-
 import fileUpload from 'express-fileupload';
-import {CID} from 'ipfs-http-client';
 import ipfsService from '../ipfs/ipfs.service';
 class FilesController {
   async createFile(req: Request, res: Response) {
@@ -49,10 +47,10 @@ class FilesController {
   }
 
   async deleteFile(req: Request, res: Response) {
-    const file = <fileUpload.UploadedFile>req.files?.file;
-    if (!file) res.status(400).send('Missing file');
+    const fileName = req.body.fileName;
+    if (!fileName) res.status(400).send('Missing fileName');
     await ipfsService
-      .deleteFile(`/${file.name}`)
+      .deleteFile(`/${fileName}`)
       .then(message => res.status(200).send(message))
       .catch(err => {
         console.log(JSON.stringify(err));

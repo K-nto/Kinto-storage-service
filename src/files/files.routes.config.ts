@@ -15,9 +15,7 @@ export class FilesRoutes extends CommonRoutesConfig {
         next();
       })
       .get(filesController.listFiles)
-      .post(filesController.createFile)
-      // @TODO: this uses filename and it's not really usable in a multiple-node context.
-      .delete(filesController.deleteFile);
+      .post(filesController.createFile);
 
     this.app
       .route(`/${USERS}/:userId/${FILES}/:fileId`)
@@ -26,10 +24,13 @@ export class FilesRoutes extends CommonRoutesConfig {
         next();
       })
       .get(filesController.getFile)
+      // @TODO: Define if possible
       .patch((req: Request, res: Response) => {
-        // @TODO: Define if possible
         res.status(200).send(`TODO: PATCH file for id ${req.params.fileId}`);
-      });
+      })
+      // @TODO: this uses filename and it's not really usable in a multiple-node context.
+      // @TODO: will make more sense for it to use :fileId BUT you can't delete files with the CID... not really sure why
+      .delete(filesController.deleteFile);
 
     return this.app;
   }

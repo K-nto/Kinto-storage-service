@@ -1,6 +1,6 @@
 import {UploadedFile} from 'express-fileupload';
 import {MFSEntry} from 'ipfs-core-types/src/files';
-import {CID, create, IPFSHTTPClient} from 'ipfs-http-client';
+import {create, IPFSHTTPClient} from 'ipfs-http-client';
 import all from 'it-all';
 /**
  * @TODO: Better error handling
