@@ -62,9 +62,6 @@ export class HyperledgerController {
     const contract = network.getContract(contractName);
 
     const result = await contract.evaluateTransaction(transaction, transactionArgs.toString());
-    console.log(
-      `Transaction has been evaluated, result is: ${result.toString()}`
-    );
 
     await gateway.disconnect();
     return result.toString();

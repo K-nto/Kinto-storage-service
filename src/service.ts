@@ -15,7 +15,6 @@ const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
 
 require('dotenv').config();
-/*
 
 app.use(express.json());
 app.use(cors());
@@ -35,9 +34,8 @@ server.listen(port, () => {
   });
   console.log(runningMessage);
 });
-*/
 
-console.log('ALO');
+/*
 const abc = async () => {
   try {
     const hyperledgerController = await HyperledgerController.create();
@@ -61,3 +59,4 @@ const abc = async () => {
   }
 }
 abc().then((response) => console.log("FINISHED"));
+*/
