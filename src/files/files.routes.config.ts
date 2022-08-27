@@ -1,6 +1,7 @@
 import {Application, Request, Response, NextFunction} from 'express';
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {FILES, USERS} from '../common/common.routes.consts';
+import filesController from './files.controller';
 
 export class FilesRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
@@ -13,16 +14,8 @@ export class FilesRoutes extends CommonRoutesConfig {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
         next();
       })
-      .get((req: Request, res: Response) => {
-        res
-          .status(200)
-          .send(`TODO: GET list of files for ${req.params.userId}`);
-      })
-      .post((req: Request, res: Response) => {
-        res
-          .status(200)
-          .send(`TODO: Post new file to userId ${req.params.userId}`);
-      });
+      .get(filesController.listFiles)
+      .post(filesController.createFile);
 
     this.app
       .route(`/${USERS}/:userId/${FILES}/:fileId`)
@@ -30,15 +23,14 @@ export class FilesRoutes extends CommonRoutesConfig {
         // Middleware executed on every route. @TODO: Validation @TODO: User authentication @TODO: Register on Hyperledger
         next();
       })
-      .get((req: Request, res: Response) => {
-        res.status(200).send(`TODO: GET file for ${req.params.fileId}`);
-      })
+      .get(filesController.getFile)
+      // @TODO: Define if possible
       .patch((req: Request, res: Response) => {
         res.status(200).send(`TODO: PATCH file for id ${req.params.fileId}`);
       })
-      .delete((req: Request, res: Response) => {
-        res.status(200).send(`TODO: DELETE file for id ${req.params.fileId}`);
-      });
+      // @TODO: this uses filename and it's not really usable in a multiple-node context.
+      // @TODO: will make more sense for it to use :fileId BUT you can't delete files with the CID... not really sure why
+      .delete(filesController.deleteFile);
 
     return this.app;
   }
