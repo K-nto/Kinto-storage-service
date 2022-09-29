@@ -78,8 +78,8 @@ export class Authenticator {
         secret,
         mspId
       );
-    } catch (error) {
-      console.log('An error ocurred while registering user: ', error);
+    } catch (error: any) {
+      console.log('An error ocurred while registering user: ', error.message);
       return false;
     }
   }

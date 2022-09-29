@@ -16,7 +16,7 @@ const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
 
 require('dotenv').config();
-
+/*
 app.use(fileUpload());
 app.use(express.json());
 app.use(cors());
@@ -35,9 +35,8 @@ server.listen(port, () => {
     debugLog(`Routes configured for ${route.getName()}`);
   });
   console.log(runningMessage);
-});
+});*/
 
-/*
 const abc = async () => {
   try {
     const hyperledgerController = await HyperledgerController.create();
@@ -52,13 +51,15 @@ const abc = async () => {
     //await hyperledgerController.getAuthenticator().registerUser(user, "org1.department1", mspid);
     console.log("OK")
 
-    console.log("Executing transaction")
-    const transactionResult = await hyperledgerController.executeTransaction(user, "mychannel", "fabcar", "queryCar", "CAR4");
-    
+    console.log("Executing transaction createFileOperation")
+    const transactionResult_1 = await hyperledgerController.executeTransaction(user, "mychannel", "kinto", "createFileOperation", "#THISISAFILEHASHFEDEPUTO", "walletxd",  "WRITE");
+    console.log("Transaction Result: ", transactionResult_1)
+
+    console.log("Executing transaction queryAllFileOperations")
+    const transactionResult = await hyperledgerController.executeTransaction(user, "mychannel", "kinto", "queryAllFileOperations");
     console.log("Transaction Result: ", transactionResult)
   } catch (error) {
     console.log(error);
   }
 }
 abc().then((response) => console.log("FINISHED"));
-*/

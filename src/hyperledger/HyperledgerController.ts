@@ -51,18 +51,23 @@ export class HyperledgerController {
   try {
     const gateway = new Gateway(); // Create a new gateway for connecting to our peer node.
     
+    console.debug("[DEBUG] Connecting to gateway: ", this.networkConfiguration, this.wallet, walletAddress);
     await gateway.connect(this.networkConfiguration, {
       wallet: this.wallet,
       identity: walletAddress,
       discovery: {enabled: true, asLocalhost: true},
     }); 
+    console.debug("[DEBUG] Connection successful")
 
+    console.debug("[DEBUG] Getting network: ", channel)
     const network = await gateway.getNetwork(channel);
-
+    
+    console.debug("[DEBUG] Getting contract:", contractName);
     const contract = network.getContract(contractName);
 
-    const result = await contract.evaluateTransaction(transaction, transactionArgs.toString());
-
+    console.debug("[DEBUG] Evaluating transaction:", transaction, transactionArgs);
+    let result =  (transactionArgs.length > 0) ? await contract.evaluateTransaction(transaction, ...transactionArgs) : await contract.evaluateTransaction(transaction)
+    console.debug("[DEBUG] Disconnecting gateway")
     await gateway.disconnect();
     return result.toString();
   } catch (error) {
