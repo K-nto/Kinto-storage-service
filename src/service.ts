@@ -5,7 +5,7 @@ import {FilesRoutes} from './files/files.routes.config';
 import {NodesRoutes} from './nodes/nodes.routes.config';
 import express from 'express';
 import * as http from 'http';
-import { HyperledgerController } from './hyperledger/HyperledgerController';
+import {HyperledgerController} from './hyperledger/HyperledgerController';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 
@@ -40,26 +40,39 @@ server.listen(port, () => {
 const abc = async () => {
   try {
     const hyperledgerController = await HyperledgerController.create();
-    const mspid = "Org1MSP";
-    const user = "appUser";
+    const mspid = 'Org1MSP';
+    const user = 'appUser';
 
-    console.log("Registering admin")
+    console.log('Registering admin');
     //await hyperledgerController.getAuthenticator().registerAdmin(mspid);
-    console.log("OK")
+    console.log('OK');
 
-    console.log("Registering user")
-    //await hyperledgerController.getAuthenticator().registerUser(user, "org1.department1", mspid);
-    console.log("OK")
+    console.log('Registering user');
+    //await hyperledgerController.getAuthenticator().registerUser(user, 'org1.department1', mspid);
+    console.log('OK');
 
-    console.log("Executing transaction createFileOperation")
-    const transactionResult_1 = await hyperledgerController.executeTransaction(user, "mychannel", "kinto", "createFileOperation", "#THISISAFILEHASHFEDEPUTO", "walletxd",  "WRITE");
-    console.log("Transaction Result: ", transactionResult_1)
+    console.log('Executing transaction createFileOperation');
+    const transactionResult_1 = await hyperledgerController.executeTransaction(
+      user,
+      'mychannel',
+      'kinto',
+      'createFileOperation',
+      '#THISISAFILEHASHFEDEPUTO',
+      'walletxd',
+      'WRITE'
+    );
+    console.log('Transaction Result: ', transactionResult_1);
 
-    console.log("Executing transaction queryAllFileOperations")
-    const transactionResult = await hyperledgerController.executeTransaction(user, "mychannel", "kinto", "queryAllFileOperations");
-    console.log("Transaction Result: ", transactionResult)
+    console.log('Executing transaction queryAllFileOperations');
+    const transactionResult = await hyperledgerController.executeTransaction(
+      user,
+      'mychannel',
+      'kinto',
+      'queryAllFileOperations'
+    );
+    console.log('Transaction Result: ', transactionResult);
   } catch (error) {
     console.log(error);
   }
-}
-abc().then((response) => console.log("FINISHED"));
+};
+abc().then(response => console.log('FINISHED'));

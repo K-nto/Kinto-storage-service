@@ -37,6 +37,8 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
+    "@hyperledger/fabric-gateway": "^1.1.0",
+    "@tsconfig/node14": "^1.0.3",
     "cors": "^2.8.5",
     "debug": "^4.3.4",
     "dotenv": "^16.0.1",
