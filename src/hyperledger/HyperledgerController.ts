@@ -81,6 +81,7 @@ export class HyperledgerController {
   async newSigner(): Promise<Signer> {
     const files = await fs.readdirSync(keyDirectoryPath);
     const keyPath = path.resolve(keyDirectoryPath, files[0]);
+    console.log('INFO', certPath, keyDirectoryPath, keyPath);
     const privateKeyPem = await fs.readFileSync(keyPath);
     // eslint-disable-next-line node/no-unsupported-features/node-builtins
     const privateKey = crypto.createPrivateKey(privateKeyPem);
@@ -156,11 +157,6 @@ export class HyperledgerController {
         },
       }); // Create a new gateway for connecting to our peer node.
 
-      /* await gateway.connect(this.networkConfiguration, {
-        wallet: this.wallet,
-        identity: walletAddress,
-        discovery: {enabled: true, asLocalhost: true},
-      }); */
       console.debug('[DEBUG] Connection successful');
 
       console.debug('[DEBUG] Getting network: ', channel);
@@ -174,10 +170,17 @@ export class HyperledgerController {
         transaction,
         transactionArgs
       );
-      const result =
+      const resultBytes =
         transactionArgs.length > 0
           ? await contract.evaluateTransaction(transaction, ...transactionArgs)
           : await contract.evaluateTransaction(transaction);
+
+      // eslint-disable-next-line node/no-unsupported-features/node-builtins
+      const utf8Decoder = new TextDecoder();
+
+      const resultJson = utf8Decoder.decode(resultBytes);
+      const result = JSON.parse(resultJson);
+      console.log('*** Result:', result);
       console.debug('[DEBUG] Disconnecting gateway');
       await gateway.close();
       return result.toString();

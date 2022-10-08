@@ -51,6 +51,7 @@ const abc = async () => {
     //await hyperledgerController.getAuthenticator().registerUser(user, 'org1.department1', mspid);
     console.log('OK');
 
+    /*
     console.log('Executing transaction createFileOperation');
     const transactionResult_1 = await hyperledgerController.executeTransaction(
       user,
@@ -61,7 +62,8 @@ const abc = async () => {
       'walletxd',
       'WRITE'
     );
-    console.log('Transaction Result: ', transactionResult_1);
+    console.log('Transaction Result: ', transactionResult_1); 
+    */
 
     console.log('Executing transaction queryAllFileOperations');
     const transactionResult = await hyperledgerController.executeTransaction(
