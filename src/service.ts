@@ -8,6 +8,7 @@ import * as http from 'http';
 import {HyperledgerController} from './hyperledger/HyperledgerController';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
+import {StorageOperationController} from './hyperledger/StorageOperationController';
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
@@ -73,6 +74,25 @@ const abc = async () => {
       'queryAllFileOperations'
     );
     console.log('Transaction Result: ', transactionResult);
+
+    const storageOperationController: StorageOperationController =
+      new StorageOperationController();
+    console.log('Executing getAllFileOperations');
+    storageOperationController.getAllFileOperations(user);
+    console.log('Executing getFileOperation');
+    storageOperationController.getFileOperation(
+      user,
+      '30b32cb55beb33df54c29bcc15caafd21114f5eaa89e81194864c2abe1bfd709'
+    );
+    console.log('Executing createFileOperations');
+    storageOperationController.createFileOperation(
+      user,
+      'ESTOESUNFILEHASH',
+      'WRITE'
+    );
+    console.log('Executing modifyFileOperations');
+    console.log('Executing getAllFileOperations');
+    storageOperationController.getAllFileOperations(user);
   } catch (error) {
     console.log(error);
   }

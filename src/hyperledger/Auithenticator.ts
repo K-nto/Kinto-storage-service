@@ -1,19 +1,130 @@
-import {Gateway, Wallet, Wallets, X509Identity} from 'fabric-network';
+import {Wallet, Wallets, X509Identity} from 'fabric-network';
 import FabricCAServices from 'fabric-ca-client';
-import { Console } from 'console';
+import * as fs from 'fs';
+import * as grpc from '@grpc/grpc-js';
+import path from 'path';
+import {
+  connect,
+  Contract,
+  Gateway,
+  Identity,
+  Signer,
+  signers,
+} from '@hyperledger/fabric-gateway';
+import * as crypto from 'crypto';
+
+const cryptoPath = envOrDefault(
+  'CRYPTO_PATH',
+  path.resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    'hyperledger',
+    'fabric-samples',
+    'test-network',
+    'organizations',
+    'peerOrganizations',
+    'org1.example.com'
+  )
+);
+const certPath = envOrDefault(
+  'CERT_PATH',
+  path.resolve(
+    cryptoPath,
+    'users',
+    'User1@org1.example.com',
+    'msp',
+    'signcerts',
+    'User1@org1.example.com-cert.pem'
+  )
+);
+const keyDirectoryPath = envOrDefault(
+  'KEY_DIRECTORY_PATH',
+  path.resolve(cryptoPath, 'users', 'User1@org1.example.com', 'msp', 'keystore')
+);
+const tlsCertPath = envOrDefault(
+  'TLS_CERT_PATH',
+  path.resolve(cryptoPath, 'peers', 'peer0.org1.example.com', 'tls', 'ca.crt')
+);
+const peerEndpoint = envOrDefault('PEER_ENDPOINT', 'localhost:7051');
+const peerHostAlias = envOrDefault('PEER_HOST_ALIAS', 'peer0.org1.example.com');
+const mspId = envOrDefault('MSP_ID', 'Org1MSP');
+
+/**
+ * envOrDefault() will return the value of an environment variable, or a default value if the variable is undefined.
+ */
+function envOrDefault(key: string, defaultValue: string): string {
+  return process.env[key] || defaultValue;
+}
 
 export class Authenticator {
-  private networkConfiguration: any; 
+  private networkConfiguration: any;
   private wallet: Wallet;
   private certificateAuthorityInfo: any;
 
-  constructor(walletInstance: Wallet, networkConfiguration: any, organizationId: string) {
+  constructor(
+    walletInstance: Wallet,
+    networkConfiguration: any,
+    organizationId: string
+  ) {
     this.wallet = walletInstance;
     this.networkConfiguration = networkConfiguration;
     this.certificateAuthorityInfo =
       this.networkConfiguration.certificateAuthorities[organizationId];
   }
 
+  /**
+   * @name getGatewayConnection
+   * @returns connected gateway to hyperledger blockchain
+   */
+  public async getGatewayConnection(): Promise<Gateway> {
+    const client = await this.newGrpcConnection();
+    return connect({
+      client,
+      identity: await this.newIdentity(),
+      signer: await this.newSigner(),
+      // Default timeouts for different gRPC calls
+      evaluateOptions: () => {
+        return {deadline: Date.now() + 5000}; // 5 seconds
+      },
+      endorseOptions: () => {
+        return {deadline: Date.now() + 15000}; // 15 seconds
+      },
+      submitOptions: () => {
+        return {deadline: Date.now() + 5000}; // 5 seconds
+      },
+      commitStatusOptions: () => {
+        return {deadline: Date.now() + 60000}; // 1 minute
+      },
+    }); // Create a new gateway for connecting to our peer node.
+  }
+
+  private async newGrpcConnection(): Promise<grpc.Client> {
+    const tlsRootCert = fs.readFileSync(tlsCertPath);
+    const tlsCredentials = grpc.credentials.createSsl(tlsRootCert);
+    return new grpc.Client(peerEndpoint, tlsCredentials, {
+      'grpc.ssl_target_name_override': peerHostAlias,
+    });
+  }
+
+  async newIdentity(): Promise<Identity> {
+    const credentials = fs.readFileSync(certPath);
+    return {mspId, credentials};
+  }
+
+  async newSigner(): Promise<Signer> {
+    const files = fs.readdirSync(keyDirectoryPath);
+    const keyPath = path.resolve(keyDirectoryPath, files[0]);
+    const privateKeyPem = fs.readFileSync(keyPath);
+
+    // eslint-disable-next-line node/no-unsupported-features/node-builtins
+    const privateKey = crypto.createPrivateKey(privateKeyPem);
+    return signers.newPrivateKeySigner(privateKey);
+  }
+
+  // THESE FUNCTIONS BELLOW ARE PARTLY DEPRECATED, BUT KEPT SO WE CAN REFACTOR THEM
 
   /**
    *  @method checkUserExists
@@ -100,7 +211,6 @@ export class Authenticator {
         this.certificateAuthorityInfo.caName
       );
 
-
       //await this.getAdminIdentity(); //Check identity exists
 
       // Enroll the admin user, and import the new identity into the wallet.
@@ -133,7 +243,7 @@ export class Authenticator {
     mspId: string
   ): Promise<boolean> {
     try {
-        //TODO issue with admin wallet address and secret
+      //TODO issue with admin wallet address and secret
       const enrollment = await client.enroll({
         enrollmentID: walletAddress,
         enrollmentSecret: secret,
