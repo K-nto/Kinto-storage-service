@@ -1,13 +1,25 @@
 import {Response, Request} from 'express';
 import fileUpload from 'express-fileupload';
+import { StorageOperationController } from '../hyperledger/StorageOperationController';
 import ipfsService from '../ipfs/ipfs.service';
 class FilesController {
+  private storageOperationController: StorageOperationController;
+
+  constructor() {
+    this.storageOperationController = new StorageOperationController();
+  }
+
+
   async createFile(req: Request, res: Response) {
     try {
-      console.log(`Create file for user with id ${req.params.userId}`);
+      console.log(`[INFO] Create file for user with id ${req.params.userId}`);
       const file = <fileUpload.UploadedFile>req.files?.file;
       if (!file) res.status(400).send('Missing file');
-      console.log('file received ok');
+      
+      //TODO Add filehash
+      let fileHash = "TODO_FILEHASH"
+      this.storageOperationController.createFileOperation(req.params.userId, fileHash, "WRITE");
+
       const result = await ipfsService.createFile(req.params.userId, file);
       res.status(200).send(result);
     } catch (error) {
@@ -22,6 +34,8 @@ class FilesController {
     await ipfsService
       .listFiles()
       .then(files => {
+        //TODO IMPLEMEHTT THIS THING
+        this.storageOperationController.createFileOperation(req.params.userId, req.params.userId, "READ");
         res.status(200).send(files);
       })
       .catch(err => {
@@ -37,7 +51,7 @@ class FilesController {
     await ipfsService
       .readFile(fileCID)
       .then(file => {
-        console.log('File returned');
+        this.storageOperationController.createFileOperation(req.params.userId, fileCID, "READ");
         res.status(200).send(file);
       })
       .catch(err => {
@@ -51,7 +65,12 @@ class FilesController {
     if (!fileName) res.status(400).send('Missing fileName');
     await ipfsService
       .deleteFile(`/${fileName}`)
-      .then(message => res.status(200).send(message))
+      .then(message => {
+        //TODO RESOLVE THIS
+        const fileCID = fileName;
+        this.storageOperationController.createFileOperation(req.params.userId, fileCID, "DELETE");
+        res.status(200).send(message)
+      })
       .catch(err => {
         console.log(JSON.stringify(err));
         res.status(500).send('Something went wrong on IPFS deleteFile');

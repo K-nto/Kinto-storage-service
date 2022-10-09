@@ -1,9 +1,9 @@
 import {HyperledgerController} from './HyperledgerController';
 import {StorageOperation} from './contracts/StorageOperation.interface';
+import { StorageController } from '../StorageController';
 
 export class StorageOperationController {
-  constructor() {}
-
+  //TODO we can use this to show / check history
   public async getAllFileOperations(
     walletAddress: string
   ): Promise<StorageOperation[]> {

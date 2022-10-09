@@ -17,7 +17,7 @@ const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
 
 require('dotenv').config();
-/*
+
 app.use(fileUpload());
 app.use(express.json());
 app.use(cors());
@@ -36,8 +36,9 @@ server.listen(port, () => {
     debugLog(`Routes configured for ${route.getName()}`);
   });
   console.log(runningMessage);
-});*/
+});
 
+/*
 const abc = async () => {
   try {
     const hyperledgerController = await HyperledgerController.create();
@@ -64,7 +65,7 @@ const abc = async () => {
       'WRITE'
     );
     console.log('Transaction Result: ', transactionResult_1); 
-    */
+    
 
     console.log('Executing transaction queryAllFileOperations');
     const transactionResult = await hyperledgerController.executeTransaction(
@@ -98,3 +99,4 @@ const abc = async () => {
   }
 };
 abc().then(response => console.log('FINISHED'));
+*/
