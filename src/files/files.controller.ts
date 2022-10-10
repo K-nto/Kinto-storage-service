@@ -1,9 +1,8 @@
-import {Response, Request} from 'express';
 import fileUpload from 'express-fileupload';
-import {HyperledgerController} from '../hyperledger/HyperledgerController';
 import {StorageOperationController} from '../hyperledger/StorageOperationController';
 import ipfsService from '../ipfs/ipfs.service';
-import {StorageController} from '../StorageController';
+import {MFSEntry} from 'ipfs-core-types/src/files';
+
 class FilesController {
   async createFile(userId: string, file: fileUpload.UploadedFile) {
     console.log(
@@ -12,13 +11,17 @@ class FilesController {
     try {
       return await ipfsService
         .createFile(userId, file)
-        .then(files => {
+        .then((files: MFSEntry[]) => {
           console.log('[DEBUG] files.controller - createFile: files', files);
-          new StorageOperationController().createFileOperation(
-            userId,
-            '###',
-            'write'
-          );
+
+          files.forEach((file: MFSEntry) => {
+            new StorageOperationController().createFileOperation(
+              userId,
+              file.cid.toString(),
+              'WRITE'
+            );
+          });
+
           return files;
         })
         .catch(error => error);
@@ -33,50 +36,73 @@ class FilesController {
       `[INFO] files.controller - listFiles: Listing files for userId ${userId}`
     );
     try {
-      return await ipfsService.listFiles().then(files => {
+      return await ipfsService.listFiles().then((files: MFSEntry[]) => {
         console.log('[DEBUG] files.controller - listFiles: files', files);
-        new StorageOperationController().createFileOperation(
-          userId,
-          '###',
-          'READ'
-        );
+
+        files.forEach((file: MFSEntry) => {
+          new StorageOperationController().createFileOperation(
+            userId,
+            file.cid.toString(),
+            'READ'
+          );
+        });
+
         return files;
       });
     } catch (error) {
-      console.log(
-        '[ERROR] files controller - listFiles:',
-        JSON.stringify(error)
-      );
+      console.log('[ERROR] files controller - listFiles:', error);
       throw error;
     }
   }
 
-  async getFile(req: Request, res: Response) {
-    console.log(`Download file with id ${req.params.fileId}`);
-    const fileCID = req.params.fileId;
-    if (!fileCID) res.status(400).send('File CID must be set!');
-    await ipfsService
-      .readFile(fileCID)
-      .then(file => {
-        console.log('File returned');
-        res.status(200).send(file);
-      })
-      .catch(err => {
-        console.log(JSON.stringify(err));
-        res.status(500).send('Something went wrong on IPFS readFile');
-      });
+  async getFile(userId: string, fileCID: string) {
+    console.log(
+      `[INFO] files.controller - getFile: Download file with id ${fileCID}`
+    );
+    try {
+      return await ipfsService
+        .readFile(fileCID)
+        .then(file => {
+          console.log('[DEBUG] files.controller - getFile: ', file);
+          new StorageOperationController().createFileOperation(
+            userId,
+            fileCID,
+            'READ'
+          );
+          return file;
+        })
+        .catch(error => {
+          throw error;
+        });
+    } catch (error) {
+      console.log('[ERROR] files controller - getFile:', error);
+      throw error;
+    }
   }
 
-  async deleteFile(req: Request, res: Response) {
-    const fileName = req.body.fileName;
-    if (!fileName) res.status(400).send('Missing fileName');
-    await ipfsService
-      .deleteFile(`/${fileName}`)
-      .then(message => res.status(200).send(message))
-      .catch(err => {
-        console.log(JSON.stringify(err));
-        res.status(500).send('Something went wrong on IPFS deleteFile');
-      });
+  async deleteFile(userId: string, fileName: string): Promise<string | void> {
+    console.log(
+      `[INFO] files.controller - deleteFile: delete file with name ${fileName}`
+    );
+    try {
+      return await ipfsService
+        .deleteFile(`/${fileName}`)
+        .then(message => {
+          console.log('[DEBUG] files.controller - deleteFile: ', fileName);
+          new StorageOperationController().createFileOperation(
+            userId,
+            '###',
+            'DELETE'
+          );
+          message;
+        })
+        .catch(error => {
+          throw error;
+        });
+    } catch (error) {
+      console.log('[ERROR] files controller - deleteFile:', error);
+      throw error;
+    }
   }
 }
 
