@@ -9,12 +9,16 @@ export class FilesRoutes extends CommonRoutesConfig {
   }
   configureRoutes() {
     this.app
+      // Logic for folders
       .route(`/${USERS}/:userId/${FILES}`)
       .all((req: Request, res: Response, next: NextFunction) => {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
-        console.debug("[Hyperledeger] Authenticated user: ", req.params.userId);
+        console.debug('[Hyperledeger] Authenticated user: ', req.params.userId);
 
-        console.debug("[Hyperledeger] Generated transaction: ", Math.random().toString(16).substr(16));
+        console.debug(
+          '[Hyperledeger] Generated transaction: ',
+          Math.random().toString(16).substr(16)
+        );
         next();
       })
       .get(filesController.listFiles)
@@ -24,11 +28,15 @@ export class FilesRoutes extends CommonRoutesConfig {
       .route(`/${USERS}/:userId/${FILES}/:fileId`)
       .all((req: Request, res: Response, next: NextFunction) => {
         // Middleware executed on every route. @TODO: Validation @TODO: User authentication @TODO: Register on Hyperledger
-        console.debug("[Hyperledeger] Authenticated user: ", req.params.userId);
+        console.debug('[Hyperledeger] Authenticated user: ', req.params.userId);
 
-        console.debug("[Hyperledeger] Generated transaction: ", Math.random().toString(16).substr(16));
+        console.debug(
+          '[Hyperledeger] Generated transaction: ',
+          Math.random().toString(16).substr(16)
+        );
         next();
       })
+      // @TODO: Logic for folders
       .get(filesController.getFile)
       // @TODO: Define if possible
       .patch((req: Request, res: Response) => {
