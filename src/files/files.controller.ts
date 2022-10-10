@@ -1,7 +1,7 @@
 import fileUpload from 'express-fileupload';
 import {StorageOperationController} from '../hyperledger/StorageOperationController';
 import ipfsService from '../ipfs/ipfs.service';
-import {MFSEntry} from 'ipfs-core-types/src/files';
+import {KFSEntry} from './files.interfaces';
 
 class FilesController {
   async createFile(userId: string, file: fileUpload.UploadedFile) {
@@ -11,13 +11,13 @@ class FilesController {
     try {
       return await ipfsService
         .createFile(userId, file)
-        .then((files: MFSEntry[]) => {
+        .then((files: KFSEntry[]) => {
           console.log('[DEBUG] files.controller - createFile: files', files);
 
-          files.forEach((file: MFSEntry) => {
+          files.forEach((file: KFSEntry) => {
             new StorageOperationController().createFileOperation(
               userId,
-              file.cid.toString(),
+              file.id,
               'WRITE'
             );
           });
@@ -36,13 +36,13 @@ class FilesController {
       `[INFO] files.controller - listFiles: Listing files for userId ${userId}`
     );
     try {
-      return await ipfsService.listFiles().then((files: MFSEntry[]) => {
+      return await ipfsService.listFiles().then((files: KFSEntry[]) => {
         console.log('[DEBUG] files.controller - listFiles: files', files);
 
-        files.forEach((file: MFSEntry) => {
+        files.forEach((file: KFSEntry) => {
           new StorageOperationController().createFileOperation(
             userId,
-            file.cid.toString(),
+            file.id,
             'READ'
           );
         });

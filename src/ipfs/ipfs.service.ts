@@ -34,7 +34,7 @@ class IPFSService {
   public async createFile(
     userId: string,
     file: UploadedFile
-  ): Promise<MFSEntry[]> {
+  ): Promise<KFSEntry[]> {
     const filePath = `/${file.name}`;
     console.log('[DEBUG] IPFSService - createFile', userId, file);
 
@@ -83,7 +83,7 @@ class IPFSService {
    * @returns
    */
   public async updateFile(file: File) {
-    const result: Array<MFSEntry> = [];
+    const result: Array<KFSEntry> = [];
     // IPFSService.ipfsHttpClient.files.write('/' + file.name, file);
     // result.push(...(await all(IPFSService.ipfsHttpClient.files.ls(file.name))));
     return result;
