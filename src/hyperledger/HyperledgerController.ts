@@ -1,68 +1,98 @@
-import {Gateway, Wallets} from 'fabric-network';
+import {Gateway} from '@hyperledger/fabric-gateway';
+import {Wallet, Wallets} from 'fabric-network';
 import * as fs from 'fs';
+import {Authenticator} from './Auithenticator';
 
-export class HyperledgerControler {
+export class HyperledgerController {
   private networkConfiguration: any;
-  private wallet: any;
+  private wallet: Wallet;
+  private authenticator: Authenticator;
 
-  constructor() {
-    this.networkConfiguration = JSON.parse(
-      fs.readFileSync(`${process.env.CCP_PATH}`, 'utf8')
+  private constructor(walletInstance: Wallet, networkConfiguration: any) {
+    this.networkConfiguration = networkConfiguration;
+    this.wallet = walletInstance;
+    this.authenticator = new Authenticator(
+      this.wallet,
+      this.networkConfiguration,
+      String(process.env.CA_ORG_ID)
+    );
+  }
+
+  /**
+   * @method create
+   * @async
+   * @description factory to generate hyperEdgerController
+   */
+  public static async create(): Promise<HyperledgerController> {
+    const walletInstance = await Wallets.newFileSystemWallet(
+      String(process.env.WALLET_PATH)
+    ); // Create a new file system based wallet for managing identities.
+
+    const networkConfiguration = JSON.parse(
+      fs.readFileSync(String(process.env.CCP_PATH), 'utf8')
     ); // load the network configuration
-    this.wallet = Wallets.newFileSystemWallet(`${process.env.WALLET_PATH}`); // Create a new file system based wallet for managing identities.
+
+    return new HyperledgerController(walletInstance, networkConfiguration);
   }
 
   /**
-   *  @method checkUserExists
-   *  @description Checks if wallet address is registered on hyperledger network
-   *  @param walletAddress
+   * @method executeTransaction
+   * @async
+   * @description executes a transaction
+   * @param walletAddress
+   * @param channel
+   * @param contractName
+   * @param transaction - One ore more transaction querries
    */
-  public async checkUserExists(walletAddress: string): Promise<boolean> {
-    const identity = await this.wallet.get(walletAddress);
-    if (identity) {
-      return true;
-    }
-    console.log(
-      'There is no identity for "' +
-        walletAddress +
-        '" does not exist in the network'
-    );
-    return false;
-  }
-
-  /**
-   *  @method getContract
-   *  @description Gets specific contract for a walletAddress, idenitty name in a channel
-   *  @param walletAddress
-   */
-  public async getContract(
-    walletAddress: string,
-    contractName: string,
-    channel: string
-  ): Promise<any> {
-    const gateway = new Gateway(); // Create a new gateway for connecting to our peer node.
-    await gateway.connect(this.networkConfiguration, {
-      wallet: this.wallet,
-      identity: walletAddress,
-      discovery: {enabled: true, asLocalhost: process.env.ENV ? true : false},
-    });
-
-    const network = await gateway.getNetwork(channel); // Channel network.
-
-    return network.getContract(contractName);
-  }
-
   public async executeTransaction(
-    contract: any,
-    transaction: string
+    walletAddress: string,
+    channel: string,
+    contractName: string,
+    transaction: string,
+    ...transactionArgs: string[]
   ): Promise<string> {
-    // Evaluate the specified transaction.
-    // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
-    // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-    const result = await contract.evaluateTransaction(transaction);
-    console.log(
-      `Transaction has been evaluated, result is: ${result.toString()}`
-    );
-    return result.toString();
+    try {
+      console.debug(
+        '[DEBUG] Connecting to gateway: ',
+        this.networkConfiguration,
+        this.wallet,
+        walletAddress
+      );
+      const gateway: Gateway = await this.authenticator.getGatewayConnection();
+
+      console.debug('[DEBUG] Connection successful');
+
+      console.debug('[DEBUG] Getting network: ', channel);
+      const network = await gateway.getNetwork(channel);
+
+      console.debug('[DEBUG] Getting contract:', contractName);
+      const contract = network.getContract(contractName);
+
+      console.debug(
+        '[INFO] Evaluating transaction:',
+        transaction,
+        transactionArgs
+      );
+      const resultBytes =
+        transactionArgs.length > 0
+          ? await contract.evaluateTransaction(transaction, ...transactionArgs)
+          : await contract.evaluateTransaction(transaction);
+
+      // eslint-disable-next-line node/no-unsupported-features/node-builtins
+      const utf8Decoder = new TextDecoder();
+
+      const resultJson = utf8Decoder.decode(resultBytes);
+      console.debug('[DEBUG] Disconnecting gateway');
+      await gateway.close();
+
+      return resultJson;
+    } catch (error) {
+      console.log('[ERROR] Transaction failed: ', error);
+      return '{}';
+    }
+  }
+
+  public getAuthenticator(): Authenticator {
+    return this.authenticator;
   }
 }
