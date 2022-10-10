@@ -36,6 +36,8 @@ class IPFSService {
     file: UploadedFile
   ): Promise<MFSEntry[]> {
     const filePath = `/${file.name}`;
+    console.log('[DEBUG] IPFSService - createFile', userId, file);
+
     await IPFSService.ipfsHttpClient.files.write(filePath, file.data, {
       create: true,
     });
@@ -49,6 +51,7 @@ class IPFSService {
    * @TODO: will have to change once userId is implemented
    */
   public async listFiles(dir = '/'): Promise<KFSEntry[]> {
+    console.log('[DEBUG] IPFSService - listFiles');
     return await (
       await all(IPFSService.ipfsHttpClient.files.ls(dir))
     ).map(file => this.ipfsToKinto(file));
