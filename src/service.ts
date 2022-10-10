@@ -37,6 +37,8 @@ server.listen(port, () => {
   });
   console.log(runningMessage);
 });
+
+export default app;
 /*
 const abc = async () => {
   try {
