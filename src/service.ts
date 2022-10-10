@@ -66,7 +66,7 @@ const abc = async () => {
       'WRITE'
     );
     console.log('Transaction Result: ', transactionResult_1); 
-    */
+    
 
 /*
     console.log('Executing getAllFileOperations');
@@ -107,5 +107,4 @@ const abc = async () => {
   }
 };
 abc().then(response => console.log('FINISHED'));
-
 */
