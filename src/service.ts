@@ -17,7 +17,7 @@ const routes: Array<CommonRoutesConfig> = [];
 const debugLog: debug.IDebugger = debug('app');
 
 require('dotenv').config();
-/*
+
 app.use(fileUpload());
 app.use(express.json());
 app.use(cors());
@@ -36,8 +36,8 @@ server.listen(port, () => {
     debugLog(`Routes configured for ${route.getName()}`);
   });
   console.log(runningMessage);
-});*/
-
+});
+/*
 const abc = async () => {
   try {
     const hyperledgerController = await HyperledgerController.create();
@@ -66,35 +66,44 @@ const abc = async () => {
     console.log('Transaction Result: ', transactionResult_1); 
     */
 
+/*
+    console.log('Executing getAllFileOperations');
+    await storageOperationController.getAllFileOperations(user);
+    console.log('Executing getFileOperation');
+
+    await storageOperationController.getFileOperation(
+      user,
+      '30b32cb55beb33df54c29bcc15caafd21114f5eaa89e81194864c2abe1bfd709'
+    );
+
+
     console.log('Executing transaction queryAllFileOperations');
     const transactionResult = await hyperledgerController.executeTransaction(
       user,
       'mychannel',
       'kinto',
-      'queryAllFileOperations'
+      'createFileOperation',
+      '###',
+      '###',
+      '###'
     );
     console.log('Transaction Result: ', transactionResult);
 
     const storageOperationController: StorageOperationController =
       new StorageOperationController();
-    console.log('Executing getAllFileOperations');
-    storageOperationController.getAllFileOperations(user);
-    console.log('Executing getFileOperation');
-    storageOperationController.getFileOperation(
-      user,
-      '30b32cb55beb33df54c29bcc15caafd21114f5eaa89e81194864c2abe1bfd709'
-    );
     console.log('Executing createFileOperations');
-    storageOperationController.createFileOperation(
+    await storageOperationController.createFileOperation(
       user,
       'ESTOESUNFILEHASH',
       'WRITE'
     );
-    console.log('Executing modifyFileOperations');
+
     console.log('Executing getAllFileOperations');
-    storageOperationController.getAllFileOperations(user);
+    await storageOperationController.getAllFileOperations(user);
   } catch (error) {
     console.log(error);
   }
 };
 abc().then(response => console.log('FINISHED'));
+
+*/

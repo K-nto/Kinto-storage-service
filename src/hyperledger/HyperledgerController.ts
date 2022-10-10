@@ -1,4 +1,5 @@
 import {Gateway} from '@hyperledger/fabric-gateway';
+import {Console} from 'console';
 import {Wallet, Wallets} from 'fabric-network';
 import * as fs from 'fs';
 import {Authenticator} from './Auithenticator';
@@ -52,6 +53,7 @@ export class HyperledgerController {
     ...transactionArgs: string[]
   ): Promise<string> {
     try {
+      console.log('[INFO] Transaction', transaction, transactionArgs);
       console.debug(
         '[DEBUG] Connecting to gateway: ',
         this.networkConfiguration,
@@ -62,7 +64,7 @@ export class HyperledgerController {
 
       console.debug('[DEBUG] Connection successful');
 
-      console.debug('[DEBUG] Getting network: ', channel);
+      console.debug('[DEBUG] Getting network:', channel);
       const network = await gateway.getNetwork(channel);
 
       console.debug('[DEBUG] Getting contract:', contractName);
@@ -71,7 +73,8 @@ export class HyperledgerController {
       console.debug(
         '[INFO] Evaluating transaction:',
         transaction,
-        transactionArgs
+        transactionArgs,
+        contract
       );
       const resultBytes =
         transactionArgs.length > 0
