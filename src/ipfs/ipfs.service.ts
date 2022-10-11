@@ -2,6 +2,7 @@ import {UploadedFile} from 'express-fileupload';
 import {MFSEntry} from 'ipfs-core-types/src/files';
 import {create, IPFSHTTPClient} from 'ipfs-http-client';
 import all from 'it-all';
+import {KFSEntry} from '../files/files.interfaces';
 /**
  * @TODO: Better error handling
  */
@@ -33,7 +34,7 @@ class IPFSService {
   public async createFile(
     userId: string,
     file: UploadedFile
-  ): Promise<MFSEntry[]> {
+  ): Promise<KFSEntry[]> {
     const filePath = `/${file.name}`;
     console.log('[DEBUG] IPFSService - createFile', userId, file);
 
@@ -49,9 +50,11 @@ class IPFSService {
    * @returns Array<MFSEntry> w/ the results from the node
    * @TODO: will have to change once userId is implemented
    */
-  public async listFiles(dir = '/'): Promise<MFSEntry[]> {
+  public async listFiles(dir = '/'): Promise<KFSEntry[]> {
     console.log('[DEBUG] IPFSService - listFiles');
-    return await all(IPFSService.ipfsHttpClient.files.ls(dir));
+    return await (
+      await all(IPFSService.ipfsHttpClient.files.ls(dir))
+    ).map(file => this.ipfsToKinto(file));
   }
 
   /**
@@ -80,7 +83,7 @@ class IPFSService {
    * @returns
    */
   public async updateFile(file: File) {
-    const result: Array<MFSEntry> = [];
+    const result: Array<KFSEntry> = [];
     // IPFSService.ipfsHttpClient.files.write('/' + file.name, file);
     // result.push(...(await all(IPFSService.ipfsHttpClient.files.ls(file.name))));
     return result;
@@ -99,6 +102,10 @@ class IPFSService {
       .catch(error => {
         throw error;
       });
+  }
+
+  private ipfsToKinto(file: MFSEntry) {
+    return {...file, id: file.cid.toString()};
   }
 }
 

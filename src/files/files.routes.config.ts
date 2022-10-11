@@ -10,6 +10,7 @@ export class FilesRoutes extends CommonRoutesConfig {
   }
   configureRoutes() {
     this.app
+      // Logic for folders
       .route(`/${USERS}/:userId/${FILES}`)
       .all((req: Request, res: Response, next: NextFunction) => {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
@@ -55,13 +56,14 @@ export class FilesRoutes extends CommonRoutesConfig {
         next();
       })
       .get((req: Request, res: Response) => {
+        // @TODO: Logic for folders
         const fileCID = req.params.fileId;
-        if (!fileCID) res.status(400).send('File CID must be set!');
+        if (!fileCID) return res.status(400).send('File CID must be set!');
 
-        const userId = req.body.userId;
-        if (!userId) res.status(400).send('Missing userId');
+        const userId = req.params.userId;
+        if (!userId) return res.status(400).send('Missing userId');
 
-        filesController
+        return filesController
           .getFile(userId, fileCID)
           .then(file => res.status(200).send(file))
           .catch(error =>
@@ -70,7 +72,9 @@ export class FilesRoutes extends CommonRoutesConfig {
       })
       // @TODO: Define if possible
       .patch((req: Request, res: Response) => {
-        res.status(200).send(`TODO: PATCH file for id ${req.params.fileId}`);
+        return res
+          .status(200)
+          .send(`TODO: PATCH file for id ${req.params.fileId}`);
       })
       // @TODO: this uses filename and it's not really usable in a multiple-node context.
       // @TODO: will make more sense for it to use :fileId BUT you can't delete files with the CID... not really sure why
