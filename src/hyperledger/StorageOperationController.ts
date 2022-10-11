@@ -1,6 +1,5 @@
 import {HyperledgerController} from './HyperledgerController';
 import {StorageOperation} from './contracts/StorageOperation.interface';
-import { StorageController } from '../StorageController';
 
 export class StorageOperationController {
   //TODO we can use this to show / check history
