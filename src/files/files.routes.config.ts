@@ -1,5 +1,6 @@
 import {Application, Request, Response, NextFunction} from 'express';
 import fileUpload from 'express-fileupload';
+import {authorized} from '../common/authorization.service';
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {FILES, USERS} from '../common/common.routes.consts';
 import filesController from './files.controller';
@@ -14,12 +15,20 @@ export class FilesRoutes extends CommonRoutesConfig {
       .route(`/${USERS}/:userId/${FILES}`)
       .all((req: Request, res: Response, next: NextFunction) => {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
-        console.debug('[Hyperledeger] Authenticated user: ', req.params.userId);
+        if (!authorized(req.params.userId, req.headers.authorization)) {
+          console.debug(
+            '[Authorization] Failed authentication for user: ',
+            req.params.userId
+          );
 
+          res.status(403).send('Invalid credentials');
+          return;
+        }
         console.debug(
-          '[Hyperledeger] Generated transaction: ',
-          Math.random().toString(16).substr(16)
+          '[Authorization] Authenticated user: ',
+          req.params.userId
         );
+
         next();
       })
       .get((req: Request, res: Response) =>

@@ -1,4 +1,5 @@
 import {HyperledgerController} from './../hyperledger/HyperledgerController';
+import {testUsers} from './testUsers';
 
 //TODO improve error messages
 export class UsersController {
@@ -27,5 +28,9 @@ export class UsersController {
         .checkUserExists(`${process.env.ADMIN_WALLET}`)
     )
       return; //TODO Return some error or sth
+  }
+
+  public async getUserInfo(walletAddress: string) {
+    return testUsers.find(user => user.address === walletAddress);
   }
 }
