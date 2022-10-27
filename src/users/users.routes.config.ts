@@ -1,7 +1,7 @@
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {Application, Request, Response, NextFunction} from 'express';
 import {USERS} from '../common/common.routes.consts';
-import {authorized} from '../common/authorization.service';
+import {authorized, getUserInfo} from '../common/authorization.service';
 
 export class UsersRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
@@ -39,7 +39,7 @@ export class UsersRoutes extends CommonRoutesConfig {
         next();
       })
       .get((req: Request, res: Response) => {
-        res.status(200).send(`TODO: GET user info for ${req.params.userId}`);
+        res.status(200).send(getUserInfo(req.params.userId));
       })
       .patch((req: Request, res: Response) => {
         res

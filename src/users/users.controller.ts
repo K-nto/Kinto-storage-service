@@ -29,8 +29,4 @@ export class UsersController {
     )
       return; //TODO Return some error or sth
   }
-
-  public async getUserInfo(walletAddress: string) {
-    return testUsers.find(user => user.address === walletAddress);
-  }
 }
