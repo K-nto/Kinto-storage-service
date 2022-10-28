@@ -1,5 +1,4 @@
 import {Gateway} from '@hyperledger/fabric-gateway';
-import {Console} from 'console';
 import {Wallet, Wallets} from 'fabric-network';
 import * as fs from 'fs';
 import {Authenticator} from './Auithenticator';

@@ -26,7 +26,7 @@ export class FilesRoutes extends CommonRoutesConfig {
           .listFiles(req.params.userId)
           .then(fileList => res.status(200).send(fileList))
           .catch(error =>
-            res.status(500).send('Something went wrong on IPFS listFiles')
+            res.status(500).send('Something went wrong on IPFS listFiles').end()
           )
       )
       .post((req: Request, res: Response) => {
@@ -38,7 +38,10 @@ export class FilesRoutes extends CommonRoutesConfig {
           .createFile(req.params.userId, file)
           .then(result => res.status(201).send(result))
           .catch(error =>
-            res.status(500).send('Something went wrong on IPFS createFile')
+            res
+              .status(500)
+              .send('Something went wrong on IPFS createFile')
+              .end()
           );
       });
 
@@ -56,16 +59,16 @@ export class FilesRoutes extends CommonRoutesConfig {
       })
       .get((req: Request, res: Response) => {
         const fileCID = req.params.fileId;
-        if (!fileCID) res.status(400).send('File CID must be set!');
+        if (!fileCID) res.status(400).send('File CID must be set!').end();
 
         const userId = req.body.userId;
-        if (!userId) res.status(400).send('Missing userId');
+        if (!userId) res.status(400).send('Missing userId').end();
 
         filesController
           .getFile(userId, fileCID)
           .then(file => res.status(200).send(file))
           .catch(error =>
-            res.status(500).send('Something went wrong on IPFS readFile')
+            res.status(500).send('Something went wrong on IPFS readFile').end()
           );
       })
       // @TODO: Define if possible
@@ -85,7 +88,10 @@ export class FilesRoutes extends CommonRoutesConfig {
           .deleteFile(userId, fileName)
           .then(message => res.status(200).send(message))
           .catch(error =>
-            res.status(500).send('Something went wrong on IPFS deleteFile')
+            res
+              .status(500)
+              .send('Something went wrong on IPFS deleteFile')
+              .end()
           );
       });
 
