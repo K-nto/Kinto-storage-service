@@ -44,7 +44,7 @@ export class FilesRoutes extends CommonRoutesConfig {
 
         if (!file) res.status(400).send('Missing file');
 
-        filesController
+        return filesController
           .createFile(req.params.userId, file)
           .then(result => res.status(201).send(result))
           .catch(error =>
@@ -94,7 +94,7 @@ export class FilesRoutes extends CommonRoutesConfig {
         const userId = req.body.userId;
         if (!userId) res.status(400).send('Missing userId');
 
-        filesController
+        return filesController
           .deleteFile(userId, fileName)
           .then(message => res.status(200).send(message))
           .catch(error =>
