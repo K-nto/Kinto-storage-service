@@ -42,7 +42,7 @@ export class FilesRoutes extends CommonRoutesConfig {
       .post((req: Request, res: Response) => {
         const file = <fileUpload.UploadedFile>req.files?.file;
 
-        if (!file) res.status(400).send('Missing file');
+        if (!file) return res.status(400).send('Missing file');
 
         return filesController
           .createFile(req.params.userId, file)
