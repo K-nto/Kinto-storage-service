@@ -3,9 +3,9 @@ import {MFSEntry} from 'ipfs-core-types/src/files';
 import {create, IPFSHTTPClient} from 'ipfs-http-client';
 import all from 'it-all';
 import {KFSEntry} from '../files/files.interfaces';
-/**
- * @TODO: Better error handling
- */
+
+const IPFS_DEFAULT_URL = 'http://127.0.0.1:5001/api/v0';
+
 class IPFSService {
   private static ipfsHttpClient: IPFSHTTPClient;
   /**
@@ -17,7 +17,7 @@ class IPFSService {
     // @TBD: Network url
     if (!IPFSService.ipfsHttpClient)
       IPFSService.ipfsHttpClient = create({
-        url: 'http://127.0.0.1:5002/api/v0',
+        url: process.env.IPFS_API ?? IPFS_DEFAULT_URL,
       });
   }
 

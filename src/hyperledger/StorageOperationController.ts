@@ -54,7 +54,7 @@ export class StorageOperationController {
       'kinto',
       'createFileOperation',
       fileHash,
-      walletAddress,
+      walletAddress.toString(),
       operation
     );
     console.log('[DEBUG] createFileOperation:', transactionResultPayload);
