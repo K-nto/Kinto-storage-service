@@ -2,9 +2,10 @@ import fileUpload from 'express-fileupload';
 import {StorageOperationController} from '../hyperledger/StorageOperationController';
 import ipfsService from '../ipfs/ipfs.service';
 import {KFSEntry} from './files.interfaces';
+import {IEncryptedFile} from './interfaces/IEncryptedFile.interface';
 
 class FilesController {
-  async createFile(userId: string, file: fileUpload.UploadedFile) {
+  async createFile(userId: string, file: IEncryptedFile) {
     console.log(
       `[INFO] files.controller - createFile: Create file for user with id ${userId}`
     );

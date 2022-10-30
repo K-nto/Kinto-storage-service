@@ -3,8 +3,9 @@ import {MFSEntry} from 'ipfs-core-types/src/files';
 import {create, IPFSHTTPClient} from 'ipfs-http-client';
 import all from 'it-all';
 import {KFSEntry} from '../files/files.interfaces';
+import {IEncryptedFile} from '../files/interfaces/IEncryptedFile.interface';
 
-const IPFS_DEFAULT_URL = 'http://127.0.0.1:5001/api/v0';
+const IPFS_DEFAULT_URL = 'http://127.0.0.1:5002/api/v0';
 
 class IPFSService {
   private static ipfsHttpClient: IPFSHTTPClient;
@@ -33,14 +34,17 @@ class IPFSService {
    */
   public async createFile(
     userId: string,
-    file: UploadedFile
+    file: IEncryptedFile
   ): Promise<KFSEntry[]> {
     const filePath = `/${file.name}`;
-    console.log('[DEBUG] IPFSService - createFile', userId, file);
-
-    await IPFSService.ipfsHttpClient.files.write(filePath, file.data, {
-      create: true,
-    });
+    console.log('[DEBUG] IPFSService - createFile', userId, file.name);
+    await IPFSService.ipfsHttpClient.files.write(
+      filePath,
+      JSON.stringify(file),
+      {
+        create: true,
+      }
+    );
     return await this.listFiles(filePath);
   }
 
@@ -70,8 +74,7 @@ class IPFSService {
     for await (const chunk of IPFSService.ipfsHttpClient.cat(cid)) {
       fileChunks.push(chunk);
     }
-    return Buffer.concat(fileChunks);
-    // return Buffer.from(fileChunks.toString())
+    return Buffer.concat(fileChunks).toString().split('}')[0].concat('}');
   }
   /**
    * Overwrites a file that already exists (AKA, has the same name) in the root dir

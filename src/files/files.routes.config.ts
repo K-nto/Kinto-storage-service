@@ -4,6 +4,7 @@ import {authorized} from '../common/authorization.service';
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {FILES, USERS} from '../common/common.routes.consts';
 import filesController from './files.controller';
+import {IEncryptedFile} from './interfaces/IEncryptedFile.interface';
 
 export class FilesRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
@@ -40,9 +41,16 @@ export class FilesRoutes extends CommonRoutesConfig {
           )
       )
       .post((req: Request, res: Response) => {
-        const file = <fileUpload.UploadedFile>req.files?.file;
+        const file: IEncryptedFile = {...req.body};
 
-        if (!file) return res.status(400).send('Missing file');
+        if (
+          !file ||
+          !file.address ||
+          !file.fileData ||
+          !file.name ||
+          !file.type
+        )
+          return res.status(400).send('Missing file');
 
         return filesController
           .createFile(req.params.userId, file)
