@@ -5,7 +5,7 @@ import all from 'it-all';
 import {KFSEntry} from '../files/files.interfaces';
 import {IEncryptedFile} from '../files/interfaces/IEncryptedFile.interface';
 
-const IPFS_DEFAULT_URL = 'http://127.0.0.1:5002/api/v0';
+const IPFS_DEFAULT_URL = 'http://127.0.0.1:5001/api/v0';
 
 class IPFSService {
   private static ipfsHttpClient: IPFSHTTPClient;
