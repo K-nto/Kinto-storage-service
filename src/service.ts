@@ -2,7 +2,6 @@ import debug from 'debug';
 import {CommonRoutesConfig} from './common/common.routes.config';
 import {UsersRoutes} from './users/users.routes.config';
 import {FilesRoutes} from './files/files.routes.config';
-import {NodesRoutes} from './nodes/nodes.routes.config';
 import express from 'express';
 import * as http from 'http';
 import {HyperledgerController} from './hyperledger/HyperledgerController';
@@ -24,7 +23,6 @@ app.use(cors());
 
 routes.push(new UsersRoutes(app));
 routes.push(new FilesRoutes(app));
-routes.push(new NodesRoutes(app));
 
 const runningMessage = `Server running at http://localhost:${port}`;
 app.get('/', (req: express.Request, res: express.Response) => {

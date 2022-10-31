@@ -1,8 +1,10 @@
 import {Application, Request, Response, NextFunction} from 'express';
 import fileUpload from 'express-fileupload';
+import {authorized} from '../common/authorization.service';
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {FILES, USERS} from '../common/common.routes.consts';
 import filesController from './files.controller';
+import {IEncryptedFile} from './interfaces/IEncryptedFile.interface';
 
 export class FilesRoutes extends CommonRoutesConfig {
   constructor(app: Application) {
@@ -14,12 +16,20 @@ export class FilesRoutes extends CommonRoutesConfig {
       .route(`/${USERS}/:userId/${FILES}`)
       .all((req: Request, res: Response, next: NextFunction) => {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
-        console.debug('[Hyperledeger] Authenticated user: ', req.params.userId);
+        if (!authorized(req.params.userId, req.headers.authorization)) {
+          console.debug(
+            '[Authorization] Failed authentication for user: ',
+            req.params.userId
+          );
 
+          res.status(403).send('Invalid credentials');
+          return;
+        }
         console.debug(
-          '[Hyperledeger] Generated transaction: ',
-          Math.random().toString(16).substr(16)
+          '[Authorization] Authenticated user: ',
+          req.params.userId
         );
+
         next();
       })
       .get((req: Request, res: Response) =>
@@ -31,11 +41,18 @@ export class FilesRoutes extends CommonRoutesConfig {
           )
       )
       .post((req: Request, res: Response) => {
-        const file = <fileUpload.UploadedFile>req.files?.file;
+        const file: IEncryptedFile = {...req.body};
 
-        if (!file) res.status(400).send('Missing file');
+        if (
+          !file ||
+          !file.address ||
+          !file.fileData ||
+          !file.name ||
+          !file.type
+        )
+          return res.status(400).send('Missing file');
 
-        filesController
+        return filesController
           .createFile(req.params.userId, file)
           .then(result => res.status(201).send(result))
           .catch(error =>
@@ -85,7 +102,7 @@ export class FilesRoutes extends CommonRoutesConfig {
         const userId = req.body.userId;
         if (!userId) res.status(400).send('Missing userId');
 
-        filesController
+        return filesController
           .deleteFile(userId, fileName)
           .then(message => res.status(200).send(message))
           .catch(error =>

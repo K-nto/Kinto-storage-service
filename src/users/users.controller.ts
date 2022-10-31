@@ -1,4 +1,5 @@
 import {HyperledgerController} from './../hyperledger/HyperledgerController';
+import {testUsers} from './testUsers';
 
 //TODO improve error messages
 export class UsersController {

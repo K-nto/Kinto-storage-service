@@ -78,7 +78,7 @@ export class HyperledgerController {
       );
       const resultBytes =
         transactionArgs.length > 0
-          ? await contract.evaluateTransaction(transaction, ...transactionArgs)
+          ? await contract.submitTransaction(transaction, ...transactionArgs)
           : await contract.evaluateTransaction(transaction);
 
       // eslint-disable-next-line node/no-unsupported-features/node-builtins
