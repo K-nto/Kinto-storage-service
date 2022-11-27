@@ -96,14 +96,16 @@ export class FilesRoutes extends CommonRoutesConfig {
       // @TODO: this uses filename and it's not really usable in a multiple-node context.
       // @TODO: will make more sense for it to use :fileId BUT you can't delete files with the CID... not really sure why
       .delete((req: Request, res: Response) => {
+        console.log(JSON.stringify(req.body));
         const fileName = req.body.fileName;
-        if (!fileName) res.status(400).send('Missing fileName');
-
-        const userId = req.body.userId;
-        if (!userId) res.status(400).send('Missing userId');
+        if (!fileName) return res.status(500).send('Missing fileName');
+        const fileCID = req.params.fileId;
+        if (!fileCID) return res.status(500).send('Missing CID');
+        const userId = req.params.userId;
+        if (!userId) return res.status(500).send('Missing userId');
 
         return filesController
-          .deleteFile(userId, fileName)
+          .deleteFile(userId, fileName, fileCID)
           .then(message => res.status(200).send(message))
           .catch(error =>
             res.status(500).send('Something went wrong on IPFS deleteFile')

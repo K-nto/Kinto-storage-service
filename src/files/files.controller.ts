@@ -37,7 +37,7 @@ class FilesController {
       `[INFO] files.controller - listFiles: Listing files for userId ${userId}`
     );
     try {
-      return await ipfsService.listFiles().then((files: KFSEntry[]) => {
+      return await ipfsService.listFiles(userId).then((files: KFSEntry[]) => {
         console.log('[DEBUG] files.controller - listFiles: files', files);
 
         files.forEach((file: KFSEntry) => {
@@ -81,13 +81,17 @@ class FilesController {
     }
   }
 
-  async deleteFile(userId: string, fileName: string): Promise<string | void> {
+  async deleteFile(
+    userId: string,
+    fileName: string,
+    fileCID: string
+  ): Promise<string | void> {
     console.log(
       `[INFO] files.controller - deleteFile: delete file with name ${fileName}`
     );
     try {
       return await ipfsService
-        .deleteFile(`/${fileName}`)
+        .deleteFile(`/${userId}/${fileName}`)
         .then(message => {
           console.log('[DEBUG] files.controller - deleteFile: ', fileName);
           new StorageOperationController().createFileOperation(

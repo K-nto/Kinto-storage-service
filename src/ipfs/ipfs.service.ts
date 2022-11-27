@@ -36,16 +36,18 @@ class IPFSService {
     userId: string,
     file: IEncryptedFile
   ): Promise<KFSEntry[]> {
-    const filePath = `/${file.name}`;
+    const userPath = `/${userId}`;
+    const filePath = `${userPath}/${file.name}`;
     console.log('[DEBUG] IPFSService - createFile', userId, file.name);
     await IPFSService.ipfsHttpClient.files.write(
       filePath,
       JSON.stringify(file),
       {
         create: true,
+        parents: true,
       }
     );
-    return await this.listFiles(filePath);
+    return await this.listFiles(userId);
   }
 
   /**
@@ -54,10 +56,11 @@ class IPFSService {
    * @returns Array<MFSEntry> w/ the results from the node
    * @TODO: will have to change once userId is implemented
    */
-  public async listFiles(dir = '/'): Promise<KFSEntry[]> {
-    console.log('[DEBUG] IPFSService - listFiles');
+  public async listFiles(userId: string, dir = '/'): Promise<KFSEntry[]> {
+    const baseDir = `/${userId}${dir}`;
+    console.log('[DEBUG] IPFSService - listFiles', baseDir);
     return await (
-      await all(IPFSService.ipfsHttpClient.files.ls(dir))
+      await all(IPFSService.ipfsHttpClient.files.ls(baseDir)).catch(err => [])
     ).map(file => this.ipfsToKinto(file));
   }
 
