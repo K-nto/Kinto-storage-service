@@ -1,8 +1,7 @@
-import {Gateway} from '@hyperledger/fabric-gateway';
-import {Console} from 'console';
-import {Wallet, Wallets} from 'fabric-network';
+import {Gateway, Wallet, Wallets, X509Identity} from 'fabric-network';
 import * as fs from 'fs';
 import {Authenticator} from './Auithenticator';
+const path = require('path');
 
 export class HyperledgerController {
   private networkConfiguration: any;
@@ -60,11 +59,15 @@ export class HyperledgerController {
         this.wallet,
         walletAddress
       );
-      const gateway: Gateway = await this.authenticator.getGatewayConnection();
+      const gateway: Gateway = await this.connectGateway();
 
       console.debug('[DEBUG] Connection successful');
 
-      console.debug('[DEBUG] Getting network:', channel);
+      console.debug(
+        '[DEBUG] Getting network:',
+        channel,
+        process.env.CHANNEL_ID
+      );
       const network = await gateway.getNetwork(channel);
 
       console.debug('[DEBUG] Getting contract:', contractName);
@@ -86,13 +89,65 @@ export class HyperledgerController {
 
       const resultJson = utf8Decoder.decode(resultBytes);
       console.debug('[DEBUG] Disconnecting gateway');
-      await gateway.close();
+      await gateway.disconnect();
 
       return resultJson;
     } catch (error) {
       console.log('[ERROR] Transaction failed: ', error);
       return '{}';
     }
+  }
+
+  private async registerWallet() {
+    try {
+      console.log('[INFO] Registering wallet');
+      const ADMIN_CERT = await fs.readFileSync(
+        String(process.env.ADMIN_CERT),
+        'utf8'
+      );
+      const ADMIN_PRIVATE_KEY = await fs.readFileSync(
+        String(process.env.ADMIN_PRIVATE_KEY),
+        'utf8'
+      );
+
+      const wallet = this.wallet;
+      const identityLabel = String(process.env.IDENTITY_LABEL);
+
+      const existingIdentity = await wallet.get(identityLabel);
+      if (existingIdentity) {
+        await wallet.remove(identityLabel);
+      }
+
+      const identity: X509Identity = {
+        credentials: {
+          certificate: ADMIN_CERT,
+          privateKey: ADMIN_PRIVATE_KEY,
+        },
+        mspId: String(process.env.MSP_ID),
+        type: 'X.509',
+      };
+      await wallet.put(identityLabel, identity);
+    } catch (error: any) {
+      console.log(`[ERROR] Error adding to wallet. ${error}`);
+      console.log(error.stack);
+    }
+  }
+
+  private async connectGateway(): Promise<Gateway> {
+    const gateway = new Gateway();
+    await this.registerWallet();
+    const wallet = await Wallets.newFileSystemWallet(
+      path.join(process.cwd(), process.env.WALLET_PATH)
+    );
+
+    console.log('[INFO] CONNECT GATEWAY');
+    await gateway.connect(this.networkConfiguration, {
+      identity: 'Admin',
+      wallet: wallet,
+      discovery: {enabled: true, asLocalhost: false},
+    });
+    console.log('[DEBUG] success');
+    return gateway;
   }
 
   public getAuthenticator(): Authenticator {

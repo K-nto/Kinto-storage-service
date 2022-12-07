@@ -1,11 +1,10 @@
-import {Wallet, Wallets, X509Identity} from 'fabric-network';
+import {Wallet, X509Identity} from 'fabric-network';
 import FabricCAServices from 'fabric-ca-client';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import path from 'path';
 import {
   connect,
-  Contract,
   Gateway,
   Identity,
   Signer,
@@ -13,42 +12,30 @@ import {
 } from '@hyperledger/fabric-gateway';
 import * as crypto from 'crypto';
 
-const cryptoPath = envOrDefault(
-  'CRYPTO_PATH',
-  path.resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    'hyperledger',
-    'fabric-samples',
-    'test-network',
-    'organizations',
-    'peerOrganizations',
-    'org1.example.com'
-  )
-);
+const cryptoPath = envOrDefault('CRYPTO_PATH', path.resolve('certs'));
 const certPath = envOrDefault(
   'CERT_PATH',
-  path.resolve(
-    cryptoPath,
-    'users',
-    'User1@org1.example.com',
-    'msp',
-    'signcerts',
-    'User1@org1.example.com-cert.pem'
-  )
+  path.resolve(cryptoPath, 'msp', 'signcerts', String(process.env.CERT_PATH))
 );
+
 const keyDirectoryPath = envOrDefault(
   'KEY_DIRECTORY_PATH',
-  path.resolve(cryptoPath, 'users', 'User1@org1.example.com', 'msp', 'keystore')
+  path.resolve(cryptoPath, 'msp', 'keystore')
 );
 const tlsCertPath = envOrDefault(
   'TLS_CERT_PATH',
-  path.resolve(cryptoPath, 'peers', 'peer0.org1.example.com', 'tls', 'ca.crt')
+  path.resolve(
+    cryptoPath,
+    'msp',
+    'tlscacerts',
+    String(process.env.TLS_CERT_PATH)
+  )
 );
-const peerEndpoint = envOrDefault('PEER_ENDPOINT', 'localhost:7051');
+
+const peerEndpoint = envOrDefault(
+  'PEER_ENDPOINT',
+  String(process.env.PEER_ENDPOINT)
+);
 const peerHostAlias = envOrDefault('PEER_HOST_ALIAS', 'peer0.org1.example.com');
 const mspId = envOrDefault('MSP_ID', 'Org1MSP');
 
@@ -71,10 +58,11 @@ export class Authenticator {
   ) {
     this.wallet = walletInstance;
     this.networkConfiguration = networkConfiguration;
-    this.certificateAuthorityInfo =
-      this.networkConfiguration.certificateAuthorities[organizationId];
+    this.certificateAuthorityInfo = this.networkConfiguration;
   }
 
+  git config --global user.signkey FFF5DB2AA8F1D2B9 && git config --global user.name "bizk" && git config --global user.email "santiago.yanzon1999@gmail.com"
+  
   /**
    * @name getGatewayConnection
    * @returns connected gateway to hyperledger blockchain

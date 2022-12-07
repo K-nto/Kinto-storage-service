@@ -1,6 +1,10 @@
 import {HyperledgerController} from './HyperledgerController';
 import {StorageOperation} from './contracts/StorageOperation.interface';
 
+require('dotenv').config();
+const CHAINCODE_NAME = process.env.CHAINCODE_NAME ?? '';
+const CHANNEL_ID = process.env.CHANNEL_ID ?? '';
+
 export class StorageOperationController {
   //TODO we can use this to show / check history
   public async getAllFileOperations(
@@ -10,8 +14,8 @@ export class StorageOperationController {
       await HyperledgerController.create()
     ).executeTransaction(
       walletAddress,
-      'mychannel',
-      'kinto',
+      CHANNEL_ID,
+      CHAINCODE_NAME,
       'queryAllFileOperations'
     );
     console.log(
@@ -29,8 +33,8 @@ export class StorageOperationController {
       await HyperledgerController.create()
     ).executeTransaction(
       walletAddress,
-      'mychannel',
-      'kinto',
+      CHANNEL_ID,
+      CHAINCODE_NAME,
       'queryFileOperation',
       ID
     );
@@ -50,8 +54,8 @@ export class StorageOperationController {
       await HyperledgerController.create()
     ).executeTransaction(
       walletAddress,
-      'mychannel',
-      'kinto',
+      CHANNEL_ID,
+      CHAINCODE_NAME,
       'createFileOperation',
       fileHash,
       walletAddress.toString(),
@@ -70,8 +74,8 @@ export class StorageOperationController {
       await HyperledgerController.create()
     ).executeTransaction(
       walletAddress,
-      'mychannel',
-      'kinto',
+      CHANNEL_ID,
+      CHAINCODE_NAME,
       'modifyFile',
       operationId,
       fileHash
