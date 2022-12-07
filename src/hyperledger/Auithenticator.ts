@@ -61,8 +61,6 @@ export class Authenticator {
     this.certificateAuthorityInfo = this.networkConfiguration;
   }
 
-  git config --global user.signkey FFF5DB2AA8F1D2B9 && git config --global user.name "bizk" && git config --global user.email "santiago.yanzon1999@gmail.com"
-  
   /**
    * @name getGatewayConnection
    * @returns connected gateway to hyperledger blockchain
