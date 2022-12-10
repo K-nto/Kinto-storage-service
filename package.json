@@ -52,6 +52,9 @@
     "ipfs-core-types": "^0.11.1",
     "ipfs-http-client": "56.0.3",
     "it-all": "^1.0.6",
-    "libp2p": "^0.37.3"
+    "libp2p": "^0.37.3",
+    "node-color-log": "^10.0.2",
+    "redis": "^4.5.1",
+    "redis-om": "^0.3.6"
   }
 }

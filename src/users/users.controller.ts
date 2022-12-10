@@ -1,31 +1,45 @@
-import {HyperledgerController} from './../hyperledger/HyperledgerController';
+import {Client, Repository} from 'redis-om';
+import {UserSchema, UserInterface, User} from './User.entity';
+
+const DEFAULT_REDIS_CLIENT_URL = 'redis://default:redispw@localhost:6379';
 
 //TODO improve error messages
 export class UsersController {
-  private hyperledgerController: HyperledgerController;
-  constructor(hyperledgerControllerInstance: HyperledgerController) {
-    this.hyperledgerController = hyperledgerControllerInstance;
+  private usersRepository: Repository<User>;
+
+  constructor() {
+    const CLIENT_URL = process.env.REDIS_CLIENT_URL ?? DEFAULT_REDIS_CLIENT_URL;
+    const client = new Client();
+    client.open(CLIENT_URL);
+    this.usersRepository = client.fetchRepository(UserSchema);
+    this.usersRepository.createIndex();
+  }
+
+  /**
+   * @method loginUser
+   * @param wallet
+   * @param secret
+   */
+  public async loginUser(wallet: string, secret: string) {
+    return (await (
+      await this.usersRepository.fetch(wallet)
+    ).toJSON()) as UserInterface;
   }
 
   /**
    * @method registerUser
-   * @param walletAddress
-   * @param fileLocation
+   * @param wallet
+   * @param secret
    */
-
-  //TODO define file location
-  public async registerUser(walletAddress: string, fileLocation: any) {
-    if (
-      !this.hyperledgerController
-        .getAuthenticator()
-        .checkUserExists(walletAddress)
-    )
-      return; //TODO Return some error or sth
-    if (
-      !this.hyperledgerController
-        .getAuthenticator()
-        .checkUserExists(`${process.env.ADMIN_WALLET}`)
-    )
-      return; //TODO Return some error or sth
+  public async registerUser(wallet: string, secret: string) {
+    return (
+      (await this.usersRepository.createAndSave({
+        wallet,
+        name: wallet,
+        secret,
+        availableSpace: 0,
+        usedSpace: 0,
+      })) !== undefined
+    );
   }
 }
