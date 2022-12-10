@@ -1,7 +1,6 @@
 import {CommonRoutesConfig} from '../common/common.routes.config';
 import {Application, Request, Response, NextFunction} from 'express';
 import {USERS} from '../common/common.routes.consts';
-import {authorized, getUserInfo} from '../common/authorization.service';
 import {UsersController} from './users.controller';
 import logger from 'node-color-log';
 import {UserInterface} from './User.entity';

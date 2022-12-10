@@ -16,15 +16,15 @@ export class FilesRoutes extends CommonRoutesConfig {
       .route(`/${USERS}/:userId/${FILES}`)
       .all((req: Request, res: Response, next: NextFunction) => {
         // Middleware executed on every route. @TODO: Validation  @TODO: User authentication @TODO: Register on Hyperledger
-        if (!authorized(req.params.userId, req.headers.authorization)) {
-          console.debug(
-            '[Authorization] Failed authentication for user: ',
-            req.params.userId
-          );
+        // if (!authorized(req.params.userId, req.headers.authorization)) {
+        //   console.debug(
+        //     '[Authorization] Failed authentication for user: ',
+        //     req.params.userId
+        //   );
 
-          res.status(403).send('Invalid credentials');
-          return;
-        }
+        //   res.status(403).send('Invalid credentials');
+        //   return;
+        // }
         console.debug(
           '[Authorization] Authenticated user: ',
           req.params.userId
