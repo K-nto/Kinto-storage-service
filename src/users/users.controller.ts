@@ -38,7 +38,7 @@ export class UsersController {
   public async registerUser(wallet: string, secret: string) {
     return (
       (await this.usersRepository.createAndSave({
-        wallet,
+        address: wallet,
         name: wallet,
         secret,
         availableSpace: 0,
