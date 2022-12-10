@@ -21,9 +21,13 @@ export class UsersController {
    * @param secret
    */
   public async loginUser(wallet: string, secret: string) {
-    return (await (
-      await this.usersRepository.fetch(wallet)
-    ).toJSON()) as UserInterface;
+    return (
+      await this.usersRepository
+        .search()
+        .where('address')
+        .eq(wallet)
+        .returnFirst()
+    )?.toJSON() as UserInterface;
   }
 
   /**
